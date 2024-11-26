@@ -42,3 +42,19 @@ type ReplaceStr<
 > = Str extends `${infer Prefix}${From}${infer Suffix}` ? `${Prefix}${To}${Suffix}` : Str
 type ReplaceStrResult1 = ReplaceStr<"Guangguang's best friend is ?", '?', 'Dongdong'>
 type ReplaceStrResult2 = ReplaceStr<"abc", '?', 'Dongdong'>
+
+// 去掉右侧空白字符Trim
+type TrimStrRight<Str extends string> = 
+  Str extends `${infer Rest}${' ' | '\n' | '\t'}` 
+    ? TrimStrRight<Rest> : Str
+type TrimRightResult = TrimStrRight<"Guangguang   ">
+// 去掉左侧空白字符TrimLeft
+type TrimStrLeft<Str extends string> = 
+  Str extends `${' ' | '\n' | '\t'}${infer Rest}`
+    ? TrimStrLeft<Rest> : Str
+type TrimLeftResult = TrimStrLeft<"   Guangguang">
+// 去掉两侧空白字符Trim
+type TrimStr<Str extends string> = TrimStrLeft<TrimStrRight<Str>>
+type TrimStrResult = TrimStr<"   Guangguang   ">
+
+// 三、函数
