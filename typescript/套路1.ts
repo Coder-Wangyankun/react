@@ -53,8 +53,32 @@ type TrimStrLeft<Str extends string> =
   Str extends `${' ' | '\n' | '\t'}${infer Rest}`
     ? TrimStrLeft<Rest> : Str
 type TrimLeftResult = TrimStrLeft<"   Guangguang">
-// 去掉两侧空白字符Trim
+// 去掉两侧空白字符Trim 
 type TrimStr<Str extends string> = TrimStrLeft<TrimStrRight<Str>>
 type TrimStrResult = TrimStr<"   Guangguang   ">
 
 // 三、函数
+// 提取参数的类型
+type GetParameters<Func extends Function> = 
+  Func extends (...args: infer Args) => unknown ? Args : never
+type GetParametersResult = GetParameters<(a: number, b: string) => void>
+
+
+// 提取返回值的类型
+type GetReturnType<Func extends Function> = 
+  Func extends (...args: any[]) => infer ReturuType ? ReturuType : never
+type GetReturnTypeResult = GetReturnType<(a: number, b: string) => 'dong'>
+
+class Dong {
+  name: string
+
+  constructor() {
+    this.name = 'dong'
+  }
+  hello(this: Dong) {
+    return "hello, I'm " + this.name
+  }
+}
+const dong = new Dong()
+dong.hello()
+dong.hello.call(dong)
