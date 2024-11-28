@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2015"], // 运行环境中有哪些API，涵盖在ES2015中
+    "module": "commonjs", // 编译成commonjs模块
+    "outDir": "dist",
+    "sourceMap": true,
+    "strict": true, // 强制所有代码都正确声明了类型
+    "target": "ES2015" // 编译成哪个JS版本
+  },
+  "include": [
+    "src"
+  ]
+}
