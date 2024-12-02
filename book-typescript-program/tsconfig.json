@@ -6,7 +6,8 @@
     "sourceMap": true,
     "strict": true, // 强制所有代码都正确声明了类型
     "target": "ES2015", // 编译成哪个JS版本
-    "noImplicitAny": true // 有隐式any的时候报错
+    "noImplicitAny": true, // 有隐式any的时候报错
+    "preserveConstEnums": true // 保留const enum 编译成的对象
   },
   "include": [
     "src"
