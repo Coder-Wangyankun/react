@@ -1,3 +1,5 @@
+// 消除分支切换cleanup造成的无限循环的问题
+
 const data = {
   ok: true,
   text: 'hello world'

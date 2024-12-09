@@ -39,7 +39,7 @@ const mountElement = (vnode, container) => {
       el.addEventListener(eventName, vnode.props[key])
     }
   }
-  if (typeof vnode.tag === 'string') {
+  if (typeof vnode.children === 'string') {
     const text = document.createTextNode(vnode.children)
     el.appendChild(text)
   } else if (Array.isArray(vnode.children)) {

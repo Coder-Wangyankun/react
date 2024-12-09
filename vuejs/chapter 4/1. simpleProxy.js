@@ -1,3 +1,5 @@
+// 最简单的响应式
+
 const bucket = new Set()
 
 const data = {

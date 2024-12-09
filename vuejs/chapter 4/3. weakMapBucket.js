@@ -1,3 +1,6 @@
+// 解决副作用函数硬编码的问题
+// 建立副作用函数与被操作字段之间的联系
+
 const bucket = new WeakMap()
 
 const data = {
