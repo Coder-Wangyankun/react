@@ -3,11 +3,15 @@ const data = {
 }
 
 let activeEffect
+const effectStack = []
 const effect = (fn, options = {}) => {
   const effectFn = () => {
     cleanup(effectFn)
     activeEffect = effectFn
+    effectStack.push(effectStack)
     fn()
+    effectStack.pop()
+    activeEffect = effectStack[effectStack.length - 1]
   }
   effectFn.deps = []
   effectFn.options = options
@@ -54,7 +58,6 @@ const trigger = (target, key) => {
   if (!depsMap) return
   const effects = depsMap.get(key)
   const effectsToRun = new Set()
-  debugger
   effects && effects.forEach(effectFn => {
     if (effectFn !== activeEffect) {
       effectsToRun.add(effectFn)
@@ -73,9 +76,6 @@ effect(() => {
   console.log(obj.foo)
 }, {
   scheduler(fn) {
-    // Promise.resolve().then(() => {
-    //   fn()
-    // })
     setTimeout(fn, 0)
   }
 })

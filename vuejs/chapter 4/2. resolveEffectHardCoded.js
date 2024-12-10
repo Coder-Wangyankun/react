@@ -1,3 +1,5 @@
+// 解决副作用函数硬编码问题
+
 const bucket = new Set()
 
 const data = {

@@ -1,6 +1,8 @@
+// 处理副作用函数嵌套的情况
+
 const data = {
   ok: true,
-  text: 'hello world'
+  text: 'hello world',
 }
 
 let activeEffect
@@ -57,7 +59,12 @@ const trigger = (target, key) => {
   let depsMap = bucket.get(target)
   if (!depsMap) return
   const effects = depsMap.get(key)
-  const effectsToRun = new Set(effects)
+  const effectsToRun = new Set()
+  effects && effects.forEach(effectFn => {
+    if (effectFn !== activeEffect) {
+      effectsToRun.add(effectFn)
+    }
+  })
   effectsToRun.forEach(effectFn => effectFn())
 }
 
@@ -74,3 +81,7 @@ obj.ok = false
 // 此时的依赖
 // ok => set(1) effectFn
 // text => set(0)
+
+setTimeout(() => {
+  obj.ok = true
+}, 3000)

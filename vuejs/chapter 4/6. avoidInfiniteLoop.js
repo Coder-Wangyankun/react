@@ -57,7 +57,7 @@ const trigger = (target, key) => {
   const effects = depsMap.get(key)
   const effectsToRun = new Set()
   effects && effects.forEach(effectFn => {
-    if (effectFn !== activeEffect) {
+    if (effectFn !== activeEffect) { // 新增
       effectsToRun.add(effectFn)
     }
   })
@@ -77,3 +77,7 @@ obj.ok = false
 // 此时的依赖
 // ok => set(1) effectFn
 // text => set(0)
+
+setTimeout(() => {
+  obj.ok = true
+}, 3000)

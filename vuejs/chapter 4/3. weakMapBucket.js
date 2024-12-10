@@ -16,11 +16,11 @@ const effect = (fn) => {
 const obj = new Proxy(data, {
   get(target, key) {
     if (!activeEffect) return target[key]
-    const depsMap = bucket.get(target)
+    let depsMap = bucket.get(target)
     if (!depsMap) {
       bucket.set(target, depsMap = new Map())
     }
-    const deps = depsMap.get(key)
+    let deps = depsMap.get(key)
     if (!deps) {
       depsMap.set(key, deps = new Set())
     }

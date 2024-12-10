@@ -1,3 +1,5 @@
+// 抽离track和trigger函数
+
 const data = {
   text: 'hello'
 }
@@ -23,11 +25,11 @@ const obj = new Proxy(data, {
 
 const track = (target, key) => {
   if (!activeEffect) return
-  const depsMap = bucket.get(target)
+  let depsMap = bucket.get(target)
   if (!depsMap) {
     bucket.set(target, depsMap = new Map())
   }
-  const deps = depsMap.get(key)
+  let deps = depsMap.get(key)
   if (!deps) {
     depsMap.set(key, deps = new Set())
   }
@@ -35,8 +37,16 @@ const track = (target, key) => {
 }
 
 const trigger = (target, key) => {
-  const depsMap = bucket.get(target)
+  let depsMap = bucket.get(target)
   if (!depsMap) return
-  const effects = depsMap.get(key)
-  effects && deps.forEach(fn => fn())
+  let effects = depsMap.get(key)
+  effects && effects.forEach(fn => fn())
 }
+
+effect(() => {
+  document.body.innerText = obj.text
+})
+
+setTimeout(() => {
+  obj.text = 'hello vue3'
+}, 3000)

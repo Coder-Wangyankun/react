@@ -74,3 +74,7 @@ obj.ok = false
 // 此时的依赖
 // ok => set(1) effectFn
 // text => set(0)
+
+setTimeout(() => {
+  obj.ok = true
+}, 3000)
