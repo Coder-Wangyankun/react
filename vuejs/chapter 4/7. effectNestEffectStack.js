@@ -11,7 +11,7 @@ const effect = (fn) => {
   const effectFn = () => {
     cleanup(effectFn)
     activeEffect = effectFn
-    effectStack.push(effectStack)
+    effectStack.push(effectFn)
     fn()
     effectStack.pop()
     activeEffect = effectStack[effectStack.length - 1]

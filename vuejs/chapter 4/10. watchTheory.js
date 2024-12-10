@@ -9,18 +9,22 @@ const effect = (fn, options = {}) => {
     cleanup(effectFn)
     activeEffect = effectFn
     effectStack.push(effectFn)
-    fn()
+    const res = fn()
     effectStack.pop()
     activeEffect = effectStack[effectStack.length - 1]
+    return res // 获取getter的返回值
   }
   effectFn.deps = []
   effectFn.options = options
-  effectFn()
+  if (!options.lazy) {
+    effectFn()
+  }
+  return effectFn // 不立即执行，所以需要拿到引用
 }
 
 const cleanup = (effectFn) => {
   for (let i = 0; i < effectFn.deps.length; i++) {
-    const deps = effectFn.deps[i]
+    const deps = effectFn.deps[i] // set集合
     deps.delete(effectFn)
   }
   effectFn.deps.length = 0
@@ -72,13 +76,53 @@ const trigger = (target, key) => {
   })
 }
 
-effect(() => {
-  console.log(obj.foo)
-}, {
-  scheduler(fn) {
-    setTimeout(fn, 0)
+const effectFn =  effect(
+  // getter
+  () => {
+    return obj.foo + obj.bar
+  }, 
+  {
+    lazy: true // 不立即执行副作用函数
   }
+)
+
+const value = effectFn() // 手动执行
+
+const watch = (source, cb) => {
+  let getter
+  if (typeof source === 'function') {
+    getter = source
+  } else {
+    getter = () => traverse(source)
+  }
+
+  let oldVal, newVal
+  const effectFn = effect(
+    () => getter(),
+    {
+      lazy: true,
+      scheduler() {
+        newVal = effectFn()
+        cb(newVal, oldVal)
+        oldVal = newVal
+      }
+    }
+  )
+  oldVal = effectFn()
+}
+
+const traverse = (value, seen = new Set()) => {
+  // typeof就是读取操作
+  if (typeof value !== 'object' || value === null || seen.has(value)) return
+  seen.add(value) // 处理循环引用
+  for (const key in value) {
+    traverse(value[key], seen)
+  }
+  return value
+}
+
+watch(obj, (newVal, oldVal) => {
+  console.log('数据变化了 ', newVal, ' ', oldVal)
 })
 
 obj.foo++
-console.log('结束了')
