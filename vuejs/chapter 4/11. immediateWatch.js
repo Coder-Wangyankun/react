@@ -9,13 +9,17 @@ const effect = (fn, options = {}) => {
     cleanup(effectFn)
     activeEffect = effectFn
     effectStack.push(effectFn)
-    fn()
+    const res = fn()
     effectStack.pop()
     activeEffect = effectStack[effectStack.length - 1]
+    return res // 获取getter的返回值
   }
   effectFn.deps = []
   effectFn.options = options
-  effectFn()
+  if (!options.lazy) {
+    effectFn()
+  }
+  return effectFn // 不立即执行，所以需要拿到引用
 }
 
 const cleanup = (effectFn) => {
@@ -72,40 +76,70 @@ const trigger = (target, key) => {
   })
 }
 
-// effect(() => {
-//   console.log(obj.foo)
-// }, {
-//   scheduler(fn) {
-//     setTimeout(fn, 0)
-//   }
-// })
-
-// obj.foo++
-// console.log('结束了')
-
-// 控制在一次事件循环中只执行一次任务队列
-const jobQueue = new Set()
-const p = Promise.resolve()
-let isFlushing = false // 是否正在刷新队列
-function flushJob() {
-  if (isFlushing) return
-  isFlushing = true
-  p.then(() => {
-    jobQueue.forEach(job => job())
-  }).finally(() => {
-    isFlushing = false
-  })
-}
-
-effect(
-  () => console.log(obj.foo),
+const effectFn =  effect(
+  // getter
+  () => {
+    return obj.foo + obj.bar
+  }, 
   {
-    scheduler(fn) {
-      jobQueue.add(fn)
-      flushJob()
-    }
+    lazy: true // 不立即执行副作用函数
   }
 )
 
-obj.foo++
-obj.foo++
+const value = effectFn() // 手动执行
+
+const watch = (source, cb, options = {}) => {
+  let getter
+  if (typeof source === 'function') {
+    getter = source
+  } else {
+    getter = () => traverse(source)
+  }
+
+  let oldVal, newVal
+
+  const job = () => {
+    newVal = effectFn()
+    cb(newVal, oldVal)
+    oldVal = newVal
+  }
+  const effectFn = effect(
+    () => getter(),
+    {
+      lazy: true,
+      scheduler: () => {
+        // 控制副作用函数的调用时机
+        if (options.flush === 'post') {
+          const p = Promise.resolve()
+          p.then(job)
+        } else {
+          job()
+        }
+      }
+    }
+  )
+  if (options.immediate) {
+    job()
+  } else {
+    oldVal = effectFn()
+  }
+}
+
+const traverse = (value, seen = new Set()) => {
+  // typeof就是读取操作
+  if (typeof value !== 'object' || value === null || seen.has(value)) return
+  seen.add(value) // 处理循环引用
+  for (const key in value) {
+    traverse(value[key], seen)
+  }
+  return value
+}
+
+watch(obj, (newVal, oldVal) => {
+  console.log('数据变化了 ', newVal, ' ', oldVal)
+}, {
+  // 回调函数在watch创建时立即执行一次
+  immediate: true
+})
+
+// obj.foo++

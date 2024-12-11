@@ -1,0 +1,33 @@
+{
+  "posts": [
+    {
+      "positionId": 1,
+      "title": "bbb",
+      "author": "lucy",
+      "info":{
+        "age":18,
+        "sex":"man"
+      }
+    },
+    {
+      "positionId": 2,
+      "title": "yyy",
+      "author": "nike"
+    },
+    {
+      "positionId": 3,
+      "title": "aaa",
+      "author": "json"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}
